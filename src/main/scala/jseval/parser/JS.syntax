@@ -1,0 +1,62 @@
+module jseval.parser.JS;
+
+header {
+  import jseval.parser.JSSyntax.*;
+}
+
+body {
+}
+
+Root : Exp
+  = Spacing Exp EOF
+  .
+
+Exp {paren}
+  = Exp "||" Exp            {Or, left, 6}
+  | Exp "&&" Exp            {And, left, 5}
+  | Exp "==" Exp            {Eq, left, 4}
+  | Exp "!=" Exp            {Ne, left, 4}
+  | Exp "===" Exp           {StrictEq, left, 4}
+  | Exp "!==" Exp           {StrictNe, left, 4}
+  | Exp "<" Exp             {Lt, left, 3}
+  | Exp "<=" Exp            {Le, left, 3}
+  | Exp ">" Exp             {Gt, left, 3}
+  | Exp ">=" Exp            {Ge, left, 3}
+  | Exp "+" Exp             {Add, left, 2}
+  | Exp "-" Exp             {Sub, left, 2}
+  | Exp "*" Exp             {Mul, left, 1}
+  | Exp "/" Exp             {Div, left, 1}
+  | Exp "%" Exp             {Mod, left, 1}
+  | '-' Primary                 {Neg}
+  | '!' Primary                 {Not}
+  | Primary
+  .
+
+Primary : Exp
+  = '(' Exp ')'
+  | DoubleLiteral {Num, 1: Double.parseDouble : Double}
+  | Name {Var}
+  | "function" '(' Name ** "," ")" "{" "return" Exp ";" "}" {Function}
+  | Primary '(' Exp ** "," ')'  {Call, left, 1}
+  | "undefined" {Undefined}
+  | "true" {True}
+  | "false" {False}
+  .
+
+Name : String
+  = Identifier
+  .
+
+DoubleLiteral : String
+  = [0-9]+ '.' [0-9]* Exponent?
+  | '.' [0-9]+ Exponent?
+  | [0-9]+ Exponent?
+  .
+
+Exponent : String
+  = [Ee] PM? [0-9]+
+  .
+
+PM : String
+  = '-' | '+'
+  .
