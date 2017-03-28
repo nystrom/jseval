@@ -34,8 +34,8 @@ Exp {paren}
 
 Primary : Exp
   = '(' Exp ')'
-  | DoubleLiteral {Num, 1: Double.parseDouble : Double}
-  | Name {Var}
+  | DoubleLiteral Spacing {Num, 1: Double.parseDouble : Double}
+  | Name Spacing {Var}
   | "function" '(' Name ** "," ")" "{" "return" Exp ";" "}" {Function}
   | Primary '(' Exp ** "," ')'  {Call, left, 1}
   | "undefined" {Undefined}
